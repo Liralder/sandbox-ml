@@ -15,7 +15,7 @@ oecd_bli = pd.read_csv(
 )
 
 # Criação de filtros para remoção de duplicidades na base.
-oecd_bli = oecd_bli.loc[(oecd_bli['Unit Code']=='PC') & (oecd_bli['INDICATOR']=='HO_BASE')]
+oecd_bli = oecd_bli.loc[(oecd_bli['Unit Code']=='AVSCORE') & (oecd_bli['INDICATOR']=='SW_LIFS') & (oecd_bli['INEQUALITY']=='TOT')]
 
 # Selecionando as colunas que serão mais importantes da Better Life Index.
 oecd_bli = oecd_bli[['Country', 'LOCATION', 'Value']]
@@ -34,13 +34,13 @@ per_capita = pd.read_csv(
     delimiter=','
 )
 
-# Selecionando as colunas que serão mais importantes da Better Life Index.
+# Selecionando as colunas que serão mais importantes da PIB per capita do site FMI.
 per_capita = per_capita[['Country Name', 'Country Code', '2021']]
 
-# Renomeando as colunas da Better Life Index.
+# Renomeando as colunas da PIB per capita do site FMI.
 per_capita = per_capita.rename(columns={'Country Name': 'País', 'Country Code': 'Sigla', '2021': 'PIB'})
 
-# Apresentando os dados da Better Life Index.
+# Apresentando os dados da PIB per capita do site FMI.
 per_capita.head(3)
 
 ##################################################################################################################
@@ -52,9 +52,13 @@ country_stats = pd.merge(
     on=['País', 'Sigla']
 )
 
-print(country_stats)
+# Remoção de dados que possuem dados 'NaN'.
+country_stats.dropna(inplace=True)
+
+# Apresentando os dados após o junção entre a base Better Life Index e PIB da FMI.
+country_stats.head(3)
 ##################################################################################################################
-# Visualização de dados para observação da distribuição.
+# Visualizando os dados construidos.
 X = np.c_[country_stats['PIB']]
 y = np.c_[country_stats['Satisfação de Vida']]
 
@@ -65,3 +69,16 @@ country_stats.plot(
 )
 
 plt.show()
+##################################################################################################################
+# Selecionando o modelo que iremos testar.
+
+model = sklearn.linear_model.LinearRegression()
+##################################################################################################################
+# Treinamento da IA
+
+model.fit(X, y)
+##################################################################################################################
+# Novo teste da IA
+
+X_new = [[22587]]
+print(model.predict(X_new))
